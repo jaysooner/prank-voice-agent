@@ -1,0 +1,18 @@
+{
+  "name": "prank-voice-agent-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "pnpm -r build",
+    "start": "pnpm -r --parallel start",
+    "start:server": "pnpm --filter server start",
+    "start:frontend": "pnpm --filter frontend start",
+    "dev": "pnpm -r --parallel dev",
+    "dev:server": "pnpm --filter server dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "test:mock-stream": "pnpm --filter server test:mock"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "packageManager": "pnpm@8.0.0"
+}

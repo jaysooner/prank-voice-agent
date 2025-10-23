@@ -1,0 +1,31 @@
+# Note: This is a basic setup for demonstration.
+# For production, you'd want multi-stage builds and better secret management.
+
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile  # You would need to create this Dockerfile
+    ports:
+      - "${PORT:-8080}:${PORT:-8080}"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      # You need a way to pass PUBLIC_HOST, as it's often dynamic (e.g., ngrok)
+      # or fixed in production.
+      # environment:
+      #   - PUBLIC_HOST=https://your-domain.com
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile  # You would need to create this Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # Next.js needs to know the backend URL for API calls
+      - NEXT_PUBLIC_API_URL=${PUBLIC_HOST:-http://localhost:8080}
