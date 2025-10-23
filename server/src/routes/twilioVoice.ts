@@ -1,9 +1,10 @@
 import { Router, Request, Response } from 'express';
-import { TwiMLVoiceResponse } from 'twilio/lib/twiml/VoiceResponse';
+import twilio from 'twilio';
 import { config } from '../config';
 import { sessionStore } from '../state/sessionStore';
 
-const router = Router();
+const router: Router = Router();
+const VoiceResponse = twilio.twiml.VoiceResponse;
 
 // This is the main webhook hit by Twilio when the call connects.
 // It returns the TwiML to start the media stream.
@@ -13,7 +14,7 @@ router.post('/', (req: Request, res: Response) => {
   console.log(`Twilio Voice Webhook: Call connected ${CallSid}`);
 
   // Create the TwiML response
-  const twiml = new TwiMLVoiceResponse();
+  const twiml = new VoiceResponse();
 
   // Create a <Start> verb with a <Stream> noun
   const stream = twiml.start().stream({

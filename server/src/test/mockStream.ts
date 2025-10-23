@@ -55,8 +55,9 @@ function sendAudioStream(ws: WebSocket) {
       );
     });
 
-    stream.on('data', (chunk: Buffer) => {
+    stream.on('data', (chunk: string | Buffer) => {
       // 3. Send "media"
+      const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
       const mediaMessage = {
         event: 'media',
         streamSid: streamSid,
@@ -64,7 +65,7 @@ function sendAudioStream(ws: WebSocket) {
           track: 'inbound',
           chunk: '1', // Mock chunk index
           timestamp: Date.now().toString(),
-          payload: chunk.toString('base64'),
+          payload: buffer.toString('base64'),
         },
       };
       ws.send(JSON.stringify(mediaMessage));

@@ -3,7 +3,7 @@ import { CallSession } from '../state/sessionStore';
 import { ConversationState } from '../state/convoState';
 import { ElevenLabsRealtime } from '../tts/elevenlabsRealtime';
 import { config } from '../config';
-import { getSystemPrompt } from '../../prompts/systemPrompt';
+import { getSystemPrompt } from '../prompts/systemPrompt';
 
 // Placeholder for the Google Generative AI SDK
 // You would use @google/generative-ai

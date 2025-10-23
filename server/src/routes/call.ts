@@ -2,9 +2,10 @@ import { Router, Request, Response } from 'express';
 import twilioClient from '../twilioClient';
 import { config } from '../config';
 import { sessionStore } from '../state/sessionStore';
-import { TwiMLVoiceResponse } from 'twilio/lib/twiml/VoiceResponse';
+import twilio from 'twilio';
 
-const router = Router();
+const router: Router = Router();
+const VoiceResponse = twilio.twiml.VoiceResponse;
 
 interface StartCallBody {
   phoneNumber: string;
@@ -32,7 +33,7 @@ router.post('/start', async (req: Request, res: Response) => {
   }
 
   try {
-    const twiml = new TwiMLVoiceResponse();
+    const twiml = new VoiceResponse();
     // Add a brief pause to allow WebSocket to connect before speech
     twiml.pause({ length: 1 });
     // The <Start><Stream> logic is handled in the /twilio/voice webhook
