@@ -2,8 +2,8 @@ import http from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
 import url from 'url';
 import { sessionStore, CallSession } from '../state/sessionStore';
-import { GeminiRealtime } from '../llm/geminiRealtime';
-import { ElevenLabsRealtime } from '../tts/elevenlabsRealtime';
+import { VeniceRealtime } from '../llm/veniceRealtime';
+import { VeniceTTS } from '../tts/veniceTTS';
 import { ConversationState } from '../state/convoState';
 import { config } from '../config';
 
@@ -62,10 +62,9 @@ export function initializeMediaStreamServer(server: http.Server) {
     });
 
     // Initialize the services for this specific call
-    // TODO: Pass 'ws' to these services so they can send audio back to Twilio
-    const ttsService = new ElevenLabsRealtime(session, ws);
+    const ttsService = new VeniceTTS(session, ws);
     const convoState = new ConversationState(session, ttsService);
-    const llmService = new GeminiRealtime(
+    const llmService = new VeniceRealtime(
       session,
       convoState,
       ttsService

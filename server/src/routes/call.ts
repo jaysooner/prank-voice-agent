@@ -57,7 +57,7 @@ router.post('/start', async (req: Request, res: Response) => {
       callSid: call.sid,
       theme,
       outline,
-      voiceId: voiceId || config.elevenLabs.defaultVoiceId,
+      voiceId: voiceId || config.venice.ttsVoice,
       logs: [
         {
           id: Date.now(),

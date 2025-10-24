@@ -8,12 +8,11 @@ export const config = {
     authToken: process.env.TWILIO_AUTH_TOKEN || '',
     callerId: process.env.TWILIO_CALLER_ID || '',
   },
-  elevenLabs: {
-    apiKey: process.env.ELEVENLABS_API_KEY || '',
-    defaultVoiceId: process.env.ELEVENLABS_VOICE_ID || 'Rachel',
-  },
-  gemini: {
-    apiKey: process.env.GEMINI_API_KEY || '',
+  venice: {
+    apiKey: process.env.VENICE_API_KEY || '',
+    llmModel: process.env.VENICE_LLM_MODEL || 'llama-3.3-70b',
+    ttsModel: process.env.VENICE_TTS_MODEL || 'tts-kokoro',
+    ttsVoice: process.env.VENICE_TTS_VOICE || 'am_adam',
   },
   maxCallSeconds: parseInt(process.env.MAX_CALL_SECONDS || '240', 10),
 };
@@ -31,10 +30,6 @@ if (!config.twilio.accountSid || !config.twilio.authToken) {
   );
 }
 
-if (!config.gemini.apiKey) {
-  console.warn('GEMINI_API_KEY is not set. LLM will not function.');
-}
-
-if (!config.elevenLabs.apiKey) {
-  console.warn('ELEVENLABS_API_KEY is not set. TTS will not function.');
+if (!config.venice.apiKey) {
+  console.warn('VENICE_API_KEY is not set. LLM and TTS will not function.');
 }
