@@ -1,6 +1,6 @@
 import { CallSession } from '../state/sessionStore';
 import { ConversationState } from '../state/convoState';
-import { VeniceTTS } from '../tts/veniceTTS';
+import { ElevenLabsWebSocket } from '../tts/elevenlabsWebSocket';
 import { config } from '../config';
 import { getSystemPrompt } from '../prompts/systemPrompt';
 
@@ -11,14 +11,14 @@ import { getSystemPrompt } from '../prompts/systemPrompt';
 export class VeniceRealtime {
   private session: CallSession;
   private convoState: ConversationState;
-  private ttsService: VeniceTTS;
+  private ttsService: ElevenLabsWebSocket;
   private conversationHistory: Array<{ role: string; content: string }> = [];
   private systemPrompt: string;
 
   constructor(
     session: CallSession,
     convoState: ConversationState,
-    ttsService: VeniceTTS
+    ttsService: ElevenLabsWebSocket
   ) {
     this.session = session;
     this.convoState = convoState;

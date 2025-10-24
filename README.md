@@ -1,6 +1,6 @@
 # Real-Time Conversational Voice Prank Agent
 
-This repository contains the full-stack code for a real-time conversational voice agent. It uses Twilio for telephony, Twilio Media Streams for real-time audio, Venice.ai for conversational AI (LLM), and Venice.ai TTS (tts-kokoro) for real-time text-to-speech.
+This repository contains the full-stack code for a real-time conversational voice agent. It uses Twilio for telephony, Twilio Media Streams for real-time audio, Venice.ai for conversational AI (LLM), OpenAI Whisper for speech-to-text, and ElevenLabs for real-time text-to-speech.
 
 ## Overview
 
@@ -9,15 +9,18 @@ The system allows a user to initiate a "prank" call to a phone number with a spe
 - **Frontend (Next.js)**: A simple UI to start calls and monitor live transcripts.
 - **Backend (Node.js/Express)**: Manages API, Twilio webhooks, and the core WebSocket server.
 - **Media Server (WebSocket)**: Handles bidirectional audio streaming with Twilio.
+- **ASR (OpenAI Whisper)**: Converts user speech to text with real-time buffering and silence detection.
 - **AI Core (Venice.ai LLM)**: Generates conversational responses using Llama 3.3 70B or other models.
-- **TTS (Venice.ai)**: Synthesizes AI responses into realistic speech using tts-kokoro model and streams them back into the call.
+- **TTS (ElevenLabs)**: Synthesizes AI responses into ultra-realistic speech using WebSocket streaming and sends them back into the call.
 
 ## Features
 
 - **Outbound Calling**: Start a call from a web UI.
 - **Real-Time Streaming**: Bidirectional audio via Twilio Media Streams & WebSockets.
-- **Conversational AI**: Uses Venice.ai LLM (Llama 3.3 70B) with streaming responses.
-- **Low-Latency TTS**: Uses Venice.ai tts-kokoro model for natural-sounding speech.
+- **Speech-to-Text**: OpenAI Whisper for accurate real-time transcription.
+- **Conversational AI**: Venice.ai LLM (Llama 3.3 70B) with streaming responses.
+- **Ultra-Low Latency TTS**: ElevenLabs WebSocket API for natural-sounding speech.
+- **Barge-In Support**: Interrupts AI speech when user starts talking.
 - **Stateful Conversation**: Follows a theme and outline while remaining conversational.
 - **Privacy-Focused**: Venice.ai provides uncensored, private AI without data retention.
 - **Safety**: Detects stop words and ends calls gracefully.
@@ -49,10 +52,12 @@ The system allows a user to initiate a "prank" call to a phone number with a spe
         │   └── twilioVoice.ts       # POST /twilio/voice (TwiML)
         ├── /ws
         │   └── mediaStreamServer.ts # WebSocket server & logic
+        ├── /asr
+        │   └── whisperRealtime.ts   # OpenAI Whisper speech-to-text
         ├── /llm
         │   └── veniceRealtime.ts    # Venice.ai LLM client with streaming
         ├── /tts
-        │   └── veniceTTS.ts         # Venice.ai TTS client (tts-kokoro)
+        │   └── elevenlabsWebSocket.ts # ElevenLabs WebSocket TTS
         ├── /state
         │   ├── sessionStore.ts      # In-memory call session storage
         │   └── convoState.ts        # State machine for conversation
@@ -138,31 +143,25 @@ This will connect to `ws://localhost:8080/ws/media` and stream a mock audio file
 
 ## Implementation Status
 
-### ✅ Fully Implemented (Venice.ai Integration)
+### ✅ Fully Implemented - Complete Speech-to-Speech Pipeline!
 
-- **Venice.ai LLM**: Complete streaming chat completion using Llama 3.3 70B
-- **Venice.ai TTS**: Real-time text-to-speech with tts-kokoro model
-- **Audio Processing**: PCM to mulaw conversion for Twilio compatibility
-- **Conversation State**: Stateful conversation management with beats/outline
-- **Stop Word Detection**: Graceful call termination
-
-### ⚠️ Still Needed
-
-- **ASR (Speech-to-Text)**: Currently not implemented. You'll need to add:
-  - OpenAI Whisper API, or
-  - Google Speech-to-Text, or
-  - Another real-time ASR service
-
-Until ASR is implemented, the bot will speak but won't understand user responses. The `handleUserText()` method in `veniceRealtime.ts` is ready to receive transcribed text.
+- **✅ OpenAI Whisper ASR**: Real-time speech-to-text with intelligent buffering and silence detection
+- **✅ Venice.ai LLM**: Streaming chat completion using Llama 3.3 70B for conversational AI
+- **✅ ElevenLabs TTS**: WebSocket-based ultra-low latency text-to-speech (mulaw_8000 format)
+- **✅ Audio Processing**: G.711 mulaw ↔ PCM conversion with proper sample rate handling
+- **✅ Barge-In**: Detects when user speaks and interrupts AI
+- **✅ Conversation State**: Stateful management with themes, outlines, and beats
+- **✅ Stop Word Detection**: Graceful call termination on keywords
 
 ### 🎯 Production Considerations
 
-- Add proper error handling and retry logic for API calls
-- Implement rate limiting
+- Add proper error handling and retry logic for all API calls
+- Implement rate limiting for Venice.ai, ElevenLabs, and Whisper APIs
 - Add monitoring and logging (e.g., Winston, Sentry)
 - Use Redis for session storage instead of in-memory
-- Improve audio format conversion (consider using ffmpeg or sox)
-- Add tests for core functionality
+- Consider optimizing audio buffer sizes for your use case
+- Add comprehensive tests for the full pipeline
+- Set up proper environment variable management for production
 
 ## Deployment
 

@@ -11,8 +11,13 @@ export const config = {
   venice: {
     apiKey: process.env.VENICE_API_KEY || '',
     llmModel: process.env.VENICE_LLM_MODEL || 'llama-3.3-70b',
-    ttsModel: process.env.VENICE_TTS_MODEL || 'tts-kokoro',
-    ttsVoice: process.env.VENICE_TTS_VOICE || 'am_adam',
+  },
+  elevenLabs: {
+    apiKey: process.env.ELEVENLABS_API_KEY || '',
+    voiceId: process.env.ELEVENLABS_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL', // Sarah voice
+  },
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY || '',
   },
   maxCallSeconds: parseInt(process.env.MAX_CALL_SECONDS || '240', 10),
 };
@@ -31,5 +36,13 @@ if (!config.twilio.accountSid || !config.twilio.authToken) {
 }
 
 if (!config.venice.apiKey) {
-  console.warn('VENICE_API_KEY is not set. LLM and TTS will not function.');
+  console.warn('VENICE_API_KEY is not set. LLM will not function.');
+}
+
+if (!config.elevenLabs.apiKey) {
+  console.warn('ELEVENLABS_API_KEY is not set. TTS will not function.');
+}
+
+if (!config.openai.apiKey) {
+  console.warn('OPENAI_API_KEY is not set. Speech-to-text will not function.');
 }

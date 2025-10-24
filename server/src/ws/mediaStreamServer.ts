@@ -3,7 +3,8 @@ import { WebSocket, WebSocketServer } from 'ws';
 import url from 'url';
 import { sessionStore, CallSession } from '../state/sessionStore';
 import { VeniceRealtime } from '../llm/veniceRealtime';
-import { VeniceTTS } from '../tts/veniceTTS';
+import { ElevenLabsWebSocket } from '../tts/elevenlabsWebSocket';
+import { WhisperRealtime } from '../asr/whisperRealtime';
 import { ConversationState } from '../state/convoState';
 import { config } from '../config';
 
@@ -62,13 +63,18 @@ export function initializeMediaStreamServer(server: http.Server) {
     });
 
     // Initialize the services for this specific call
-    const ttsService = new VeniceTTS(session, ws);
+    const ttsService = new ElevenLabsWebSocket(session, ws);
     const convoState = new ConversationState(session, ttsService);
     const llmService = new VeniceRealtime(
       session,
       convoState,
       ttsService
     );
+
+    // Initialize ASR service with callback to LLM
+    const asrService = new WhisperRealtime(session, (transcript) => {
+      llmService.handleUserText(transcript);
+    });
 
     // --- WebSocket Message Handling ---
 
@@ -91,16 +97,16 @@ export function initializeMediaStreamServer(server: http.Server) {
             // This is the core audio loop
             if (msg.media!.track === 'inbound') {
               // msg.media.payload is Base64 mulaw audio
-              // TODO: Convert mulaw to linear16 if Gemini needs it
               const audioChunk = Buffer.from(msg.media!.payload, 'base64');
 
-              // TODO: Implement barge-in logic
-              // if (ttsService.isPlaying()) {
-              //   ttsService.interrupt();
-              // }
+              // Implement barge-in logic
+              if (ttsService.getIsPlaying()) {
+                console.log('Barge-in detected, interrupting TTS');
+                ttsService.interrupt();
+              }
 
-              // Send the audio chunk to the LLM for ASR
-              llmService.sendAudio(audioChunk);
+              // Send the audio chunk to ASR for transcription
+              asrService.addAudioChunk(audioChunk);
             }
             break;
 
@@ -136,6 +142,7 @@ export function initializeMediaStreamServer(server: http.Server) {
       console.log(`Cleaning up resources for call ${callSid}`);
       llmService.stopConversation();
       ttsService.stop();
+      asrService.stop();
       // Remove from session store after a short delay to allow logs to be polled
       setTimeout(() => {
         sessionStore.delete(callSid);

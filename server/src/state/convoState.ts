@@ -1,5 +1,5 @@
 import { CallSession } from './sessionStore';
-import { VeniceTTS } from '../tts/veniceTTS';
+import { ElevenLabsWebSocket } from '../tts/elevenlabsWebSocket';
 import { config } from '../config';
 
 const STOP_WORDS = [
@@ -15,12 +15,12 @@ const STOP_WORDS = [
  */
 export class ConversationState {
   private session: CallSession;
-  private ttsService: VeniceTTS;
+  private ttsService: ElevenLabsWebSocket;
   private beats: string[];
   private currentBeat: number;
   private startTime: number;
 
-  constructor(session: CallSession, ttsService: VeniceTTS) {
+  constructor(session: CallSession, ttsService: ElevenLabsWebSocket) {
     this.session = session;
     this.ttsService = ttsService;
     this.beats = session.outline
